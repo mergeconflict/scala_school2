@@ -44,7 +44,9 @@ object Interpreter {
   class DerpLoader(root: io.AbstractFile, parent: ClassLoader) extends AbstractFileClassLoader(root, parent) {
     override def classBytes(name: String): Array[Byte] = {
       Console.err.println("omg classBytes: %s".format(name))
-      super.classBytes(name)
+      val original = super.classBytes(name)
+      val instrumented = com.atlassian.levee.instrumentor.LeveeInstrumentor.instrument(original)
+      instrumented
     }
   }
 
