@@ -9,11 +9,7 @@ class Interpreter extends Actor {
   import scala.tools.nsc._
   import scala.tools.nsc.interpreter._
 
-  private[this] val interpreter = new IMain({
-    val settings = new Settings
-    settings.usejavacp.value = true
-    settings
-  })
+  private[this] val interpreter = new Lol
 
   private[this] val completion = new JLineCompletion(interpreter)
 
@@ -34,7 +30,25 @@ class Interpreter extends Actor {
 
 object Interpreter {
 
-  val props = Props[Interpreter]
+  import scala.tools.nsc._
+  import scala.tools.nsc.interpreter._
+
+  class Lol extends IMain({
+    val settings = new Settings
+    settings.usejavacp.value = true
+    settings
+  }) {
+    override protected def parentClassLoader: ClassLoader = new DerpLoader(virtualDirectory, super.parentClassLoader)
+  }
+
+  class DerpLoader(root: io.AbstractFile, parent: ClassLoader) extends AbstractFileClassLoader(root, parent) {
+    override def classBytes(name: String): Array[Byte] = {
+      Console.err.println("omg classBytes: %s".format(name))
+      super.classBytes(name)
+    }
+  }
+
+  val props = Props[com.twitter.scaffold.Interpreter]
 
   // requests
   case class Interpret(expression: String)
