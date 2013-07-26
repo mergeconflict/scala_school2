@@ -29,8 +29,12 @@ class Interpreter extends Actor {
 
 object Interpreter {
 
+  import com.atlassian.levee.runtime.LeveeProperties._
   import scala.tools.nsc._
   import scala.tools.nsc.interpreter._
+
+  sys.props(LEVEE_TIMEOUT_PROPERTY) = "1000"
+  sys.props(LEVEE_WHITELIST_PACKAGES_PROPERTY) = "$line,java/lang,scala"
 
   class SandboxedIMain extends IMain({
     val settings = new Settings
