@@ -9,8 +9,7 @@ class Interpreter extends Actor {
   import scala.tools.nsc._
   import scala.tools.nsc.interpreter._
 
-  private[this] val interpreter = new Lol
-
+  private[this] val interpreter = new SandboxedIMain
   private[this] val completion = new JLineCompletion(interpreter)
 
   def receive = {
@@ -33,21 +32,19 @@ object Interpreter {
   import scala.tools.nsc._
   import scala.tools.nsc.interpreter._
 
-  class Lol extends IMain({
+  class SandboxedIMain extends IMain({
     val settings = new Settings
     settings.usejavacp.value = true
     settings
   }) {
-    override protected def parentClassLoader: ClassLoader = new DerpLoader(virtualDirectory, super.parentClassLoader)
-  }
-
-  class DerpLoader(root: io.AbstractFile, parent: ClassLoader) extends AbstractFileClassLoader(root, parent) {
-    override def classBytes(name: String): Array[Byte] = {
-      Console.err.println("omg classBytes: %s".format(name))
-      val original = super.classBytes(name)
-      val instrumented = com.atlassian.levee.instrumentor.LeveeInstrumentor.instrument(original)
-      instrumented
-    }
+    override protected def parentClassLoader: ClassLoader =
+      new AbstractFileClassLoader(virtualDirectory, super.parentClassLoader) {
+        override def classBytes(name: String): Array[Byte] = {
+          val original = super.classBytes(name)
+          val instrumented = com.atlassian.levee.instrumentor.Instrumentor.instrument(original)
+          instrumented
+        }
+      }
   }
 
   val props = Props[com.twitter.scaffold.Interpreter]

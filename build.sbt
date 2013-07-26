@@ -25,7 +25,6 @@ libraryDependencies ++= Seq(
   "org.scala-lang"      %  "scala-compiler"     % "2.10.2"       % "compile",
   // runtime
   "com.atlassian.levee" %  "levee-runtime"      % "1.0-SNAPSHOT" % "runtime",
-  "com.atlassian.levee" %  "sizeof-agent"       % "1.0-SNAPSHOT" % "runtime",
   "org.webjars"         %  "bootstrap"          % "2.3.2"        % "runtime",
   "org.webjars"         %  "codemirror"         % "3.14"         % "runtime",
   "org.webjars"         %  "html5shiv"          % "3.6.2"        % "runtime",
@@ -35,12 +34,6 @@ libraryDependencies ++= Seq(
   "io.spray"            %  "spray-testkit"      % "1.2-M8"       % "test",
   "org.scalatest"       %% "scalatest"          % "1.9.1"        % "test"
 )
-
-javaOptions in run ++= Seq(
-  "-javaagent:lib_managed/jars/com.atlassian.levee/sizeof-agent/sizeof-agent-1.0-SNAPSHOT.jar"
-)
-
-retrieveManaged := true
 
 fork := true
 
